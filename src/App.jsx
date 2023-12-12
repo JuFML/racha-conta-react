@@ -3,22 +3,22 @@ import { useState } from "react";
 const App = () => {
   const initialFriends = [
     {
-      Id: crypto.randomUUID(),
-      friendsName: "Henrique",
+      id: crypto.randomUUID(),
+      name: "Henrique",
       photo: "henrique-48.jpg",
       balance: 0,
       selected: false,
     },
     {
-      Id: crypto.randomUUID(),
-      friendsName: "Renata",
+      id: crypto.randomUUID(),
+      name: "Renata",
       photo: "renata-48.jpg",
       balance: -20,
       selected: false,
     },
     {
-      Id: crypto.randomUUID(),
-      friendsName: "Antonio",
+      id: crypto.randomUUID(),
+      name: "Antonio",
       photo: "antonio-48.jpg",
       balance: 7,
       selected: false,
@@ -26,9 +26,10 @@ const App = () => {
   ];
 
   const [friends, setFriends] = useState(initialFriends);
-  const [showForm, setShowForm] = useState(false);
-
-  let allFriends = [...friends];
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [totalBill, setTotalBill] = useState("");
+  const [costs, setCosts] = useState("");
+  const [whoIsGonnaPay, setWhoIsGonnaPay] = useState("you");
 
   const getMessageInfo = (balance) =>
     balance > 0
@@ -46,16 +47,42 @@ const App = () => {
           color: "white-neutral",
         };
 
-  const handleSelectClick = (name) => {
-    allFriends = [...friends];
-    console.log(allFriends);
-    allFriends.filter(
-      (friend) => friend.friendsName === name
-    )[0].selected = true;
-    // console.log((clickedFriend[0].selected = true));
-    console.log(allFriends);
-    // setFriends((prev) => [...prev, ...(clickedFriend.selected === true)]);
-    setShowForm(true);
+  const handleClickFriend = (friend) => {
+    setSelectedFriend((prev) => (prev?.id === friend.id ? null : friend));
+  };
+
+  const handleClickCalculateBill = (e) => {
+    e.preventDefault();
+    const balance = +totalBill - +costs;
+
+    setFriends((prev) =>
+      prev.map((friend) =>
+        friend.id === selectedFriend.id
+          ? {
+              ...friend,
+              balance:
+                whoIsGonnaPay === "you"
+                  ? selectedFriend.balance - (+totalBill - +costs)
+                  : selectedFriend.balance + (+totalBill - +costs),
+            }
+          : friend
+      )
+    );
+    setTotalBill("");
+    setCosts("");
+    setSelectedFriend(null);
+  };
+
+  const handleChangeGetTotalBill = (e) => {
+    setTotalBill(e.target.value);
+  };
+
+  const handleChangeGetCosts = (e) => {
+    setCosts(e.target.value);
+  };
+
+  const handleSelectWhoWillPay = (e) => {
+    setWhoIsGonnaPay(e.target.value);
   };
 
   return (
@@ -64,19 +91,22 @@ const App = () => {
       <main className="app">
         <aside className="sidebar">
           <ul>
-            {allFriends.map(({ friendsName, photo, balance }, index) => {
-              const { message, color } = getMessageInfo(balance);
+            {friends.map((friend) => {
+              const { message, color } = getMessageInfo(friend.balance);
+              const isSelectedFriend = friend.id === selectedFriend?.id;
 
               return (
-                <li key={index}>
-                  <img src={photo} alt={`avatar ${friendsName}`} />
-                  <h3>{friendsName}</h3>
+                <li key={friend.id}>
+                  <img src={friend.photo} alt={`avatar ${friend.name}`} />
+                  <h3>{friend.name}</h3>
                   <p className={color}>{message}</p>
                   <button
-                    className="button"
-                    onClick={() => handleSelectClick(friendsName)}
+                    className={`button ${
+                      isSelectedFriend ? "button-close" : null
+                    }`}
+                    onClick={() => handleClickFriend(friend)}
                   >
-                    Selecionar
+                    {isSelectedFriend ? "Fechar" : "Selecionar"}
                   </button>
                 </li>
               );
@@ -85,26 +115,37 @@ const App = () => {
           <button className="button">Adicionar Amigo(a)</button>
         </aside>
 
-        <form className="form-split-bill">
-          <h2>Rache a conta com _NOME_</h2>
-          <label>
-            💰 Valor total
-            <input type="number" defaultValue={100} />
-          </label>
-          <label>
-            💸 Seus gastos
-            <input type="number" defaultValue={50} />
-          </label>
-          <label>
-            🤑 Quem vai pagar
-            <select>
-              <option value="you">Você</option>
-              <option value="_NOME_">_NOME_</option>
-            </select>
-          </label>
-          <button className="button">Rachar conta</button>
-        </form>
-        {showForm && <>Mostra FORM</>}
+        {selectedFriend && (
+          <form className="form-split-bill" onSubmit={handleClickCalculateBill}>
+            <h2>Rache a conta com {selectedFriend?.name}</h2>
+            <label>
+              💰 Valor total
+              <input
+                type="number"
+                value={totalBill}
+                onChange={handleChangeGetTotalBill}
+              />
+            </label>
+            <label>
+              💸 Seus gastos
+              <input
+                type="number"
+                value={costs}
+                onChange={handleChangeGetCosts}
+              />
+            </label>
+            <label>
+              🤑 Quem vai pagar
+              <select onChange={handleSelectWhoWillPay}>
+                <option value="you">Você</option>
+                <option value={selectedFriend?.name}>
+                  {selectedFriend?.name}
+                </option>
+              </select>
+            </label>
+            <button className="button">Rachar conta</button>
+          </form>
+        )}
       </main>
     </>
   );
