@@ -115,7 +115,9 @@ const App = () => {
 
   return (
     <>
-      <header className="header">HEADER</header>
+      <header className="header">
+        <img src="logo-racha-conta.png" alt="log racha conta" />
+      </header>
       <main className="app">
         <aside className="sidebar">
           <ul>
