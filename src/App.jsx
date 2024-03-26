@@ -30,6 +30,9 @@ const App = () => {
   const [totalBill, setTotalBill] = useState("");
   const [costs, setCosts] = useState("");
   const [whoIsGonnaPay, setWhoIsGonnaPay] = useState("you");
+  const [showFormAddFriend, setShowFormAddFriend] = useState(false)
+  const [friendName, setFriendName] = useState("");
+  const [friendPhoto, setFriendPhoto] = useState("");
 
   const getMessageInfo = (balance) =>
     balance > 0
@@ -62,8 +65,8 @@ const App = () => {
               ...friend,
               balance:
                 whoIsGonnaPay === "you"
-                  ? selectedFriend.balance - (+totalBill - +costs)
-                  : selectedFriend.balance + (+totalBill - +costs),
+                  ? selectedFriend.balance - balance
+                  : selectedFriend.balance + balance,
             }
           : friend
       )
@@ -85,13 +88,38 @@ const App = () => {
     setWhoIsGonnaPay(e.target.value);
   };
 
+  const handleClickShowAddFriend = () => {
+    setShowFormAddFriend(!showFormAddFriend)
+  }
+
+  const handleChangeGetFriendName = (e) => {
+    setFriendName(e.target.value)
+  }
+
+  const handleChangeGetFriendPhoto = (e) => {
+    setFriendPhoto(e.target.value)
+  }
+
+  const handleClickAddFriend = () => {
+    setFriends((prev) => (
+      [...prev, {id: crypto.randomUUID(),
+        name: friendName,
+        photo: friendPhoto,
+        balance: 0,
+        selected: false,}]
+        ))
+    setFriendName("")
+    setFriendPhoto("")
+    setShowFormAddFriend(false)
+  }
+
   return (
     <>
       <header className="header">HEADER</header>
       <main className="app">
         <aside className="sidebar">
           <ul>
-            {friends.map((friend) => {
+            {friends?.map((friend) => {
               const { message, color } = getMessageInfo(friend.balance);
               const isSelectedFriend = friend.id === selectedFriend?.id;
 
@@ -112,7 +140,29 @@ const App = () => {
               );
             })}
           </ul>
-          <button className="button">Adicionar Amigo(a)</button>
+          {showFormAddFriend && (
+            <form className="form-add-friend" onSubmit={handleClickAddFriend}>
+              <label>
+              🧍‍♂️ Nome
+              <input
+                type="text"
+                value={friendName}
+                onChange={handleChangeGetFriendName}
+              />
+            </label>
+            <label>
+              📷 Foto
+              <input
+                type="text"
+                value={friendPhoto}
+                onChange={handleChangeGetFriendPhoto}
+              />
+            </label>
+            <button className="button">Adicionar</button>
+            </form>
+          )}
+
+          <button className={`button ${showFormAddFriend ? "button-close" : ""}`} onClick={handleClickShowAddFriend}>{showFormAddFriend ? "Fechar" : "Adicionar Amigo(a)"}</button>          
         </aside>
 
         {selectedFriend && (
@@ -146,6 +196,9 @@ const App = () => {
             <button className="button">Rachar conta</button>
           </form>
         )}
+
+          
+
       </main>
     </>
   );
