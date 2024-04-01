@@ -18,7 +18,7 @@
 
 ## 🔖&nbsp; About
 
-The "Espaço Mulher" is an application that helps you manage and divide the bill between you and your friends. It is a project created in order to practice some features from React. 
+The "Racha Conta" is an application that helps you manage and divide the bill between you and your friends. It is a project created in order to practice some features from React. 
 
 ---
 
