@@ -198,9 +198,6 @@ const App = () => {
             <button className="button">Rachar conta</button>
           </form>
         )}
-
-          
-
       </main>
     </>
   );
