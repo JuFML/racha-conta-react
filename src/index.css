@@ -25,6 +25,13 @@ body {
   grid-template-columns: 34rem 44rem;
   column-gap: 4rem;
   align-items: start;
+
+  @media (max-width: 840px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
 }
 
 .header {
@@ -127,6 +134,10 @@ form label {
 
 .form-split-bill {
   padding: 3.2rem 4rem;
+
+  @media (max-width: 840px) {
+    padding: 1.2rem 1rem;
+  }
 }
 
 label {
